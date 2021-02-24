@@ -1,0 +1,26 @@
+image:
+  repository: jbacic/nginx-stream-server
+  pullPolicy: Always
+  tag: latest
+
+nameOverride: ""
+fullnameOverride: ""
+
+service:
+  type: LoadBalancer
+
+# publishPassword: ""
+
+resources:
+  limits:
+    cpu: 1
+    memory: 512Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

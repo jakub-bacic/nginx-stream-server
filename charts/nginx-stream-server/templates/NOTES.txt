@@ -1,0 +1,40 @@
+
+** Please be patient while the chart is being deployed **
+
+{{- if contains "LoadBalancer" .Values.service.type }}
+  Note: It may take a few minutes for the LoadBalancer IP to be available.
+        You can watch the status of by running 'kubectl get --namespace {{ .Release.Namespace }} svc -w {{ include "nginx-stream-server.fullname" . }}'
+
+  export SERVICE_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ include "nginx-stream-server.fullname" . }} --template "{{"{{ range (index .status.loadBalancer.ingress 0) }}{{.}}{{ end }}"}}")
+{{- else }}
+  Note: Service is not publicly accessible (if you want it to acquire public IP, change service.type to 'LoadBalancer').
+
+  You can access it from your local machine using port forwarding:
+
+  HTTP:
+
+    kubectl port-forward --namespace {{ .Release.Namespace }} svc/{{ include "nginx-stream-server.fullname" . }} 8080:80
+
+  RTMP:
+
+    kubectl port-forward --namespace {{ .Release.Namespace }} svc/{{ include "nginx-stream-server.fullname" . }} 1935:1935
+{{- end }}
+
+1. Start streaming
+
+  export PUBLISH_PASSWORD=$(kubectl get secret --namespace {{ .Release.Namespace }} {{ include "nginx-stream-server.fullname" . }} -o jsonpath="{.data.publish-password}" | base64 --decode)
+  {{ if contains "LoadBalancer" .Values.service.type }}
+  echo "Server: rtmp://$SERVICE_IP/live"
+  {{- else }}
+  echo "Server: rtmp://localhost/live"
+  {{- end }}
+  echo "Stream Key: <your_key>?pwd=$PUBLISH_PASSWORD"
+
+2. Connecting to the HLS stream
+  {{ if contains "LoadBalancer" .Values.service.type }}
+  echo "Server: http://$SERVICE_IP/hls/<your_key>.m3u8"
+  {{- else }}
+  echo "Server: http://localhost:8080/hls/<your_key>.m3u8"
+  {{- end }}
+
+Happy streaming!
