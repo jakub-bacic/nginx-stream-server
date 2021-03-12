@@ -8,6 +8,7 @@ RUN apk update &&       \
             gcc         \
             binutils    \
             make        \
+            ffmpeg      \
             g++         \
             pcre        \
             pcre-dev    \
@@ -30,6 +31,7 @@ RUN cd nginx-${NGINX_VERSION}                                           && \
 
 COPY nginx.conf /usr/local/nginx/conf/nginx.conf
 COPY docker-entrypoint.sh /
+COPY transcoder.sh /usr/bin/
 
 RUN mkdir /var/live
 
