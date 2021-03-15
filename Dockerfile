@@ -39,6 +39,7 @@ RUN cd nginx-${NGINX_VERSION}                                           && \
 COPY nginx.conf /usr/local/nginx/conf/nginx.conf
 COPY docker-entrypoint.sh /
 COPY --from=builder /go/bin/transcoder /usr/bin/transcoder
+COPY less.png /less.png
 
 RUN mkdir /var/live
 
