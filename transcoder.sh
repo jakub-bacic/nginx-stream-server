@@ -14,16 +14,20 @@
 #     -master_pl_name "stream-master.m3u8" \
 #     -method PUT -http_persistent 1 "http://gcsproxy:8081/upload/$1/stream-%v.m3u8"
 
-ffmpeg -i rtmp://localhost:1935/live/$1 \
-    -fflags nobuffer -flags low_delay -strict experimental -probesize 128 \
-    -max_muxing_queue_size 400 \
-    -map 0:v:0 -map 0:a:0 -map 0:v:0 -map 0:a:0 \
-    -c:v libx264 -tune zerolatency -preset ultrafast -c:a aac -ar 48000 \
-    -sc_threshold 0 \
-    -force_key_frames "expr:gte(t,n_forced*1)" \
-    -filter:v:0 scale=w=640:h=360:force_original_aspect_ratio=decrease -b:v:0 800k -maxrate 856k -b:a:0 96k \
-    -filter:v:1 scale=w=1280:h=720:force_original_aspect_ratio=decrease -b:v:1 2800k -maxrate 2996k -b:a:1 128k \
-    -var_stream_map "v:0,a:0,name:steam-360p v:1,a:1,name:stream-720p" \
-    -hls_playlist 1 -streaming 1 -hls_time 2 -hls_list_size 2 -f hls \
-    -master_pl_name "master.m3u8" \
-    -method PUT -http_persistent 1 "http://gcsproxy:8081/upload/$1/%v.m3u8"
+# ffmpeg -i rtmp://localhost:1935/live/$1 \
+#     -fflags nobuffer -flags low_delay -strict experimental -probesize 128 \
+#     -max_muxing_queue_size 400 \
+#     -map 0:v:0 -map 0:a:0 -map 0:v:0 -map 0:a:0 -map 0:v:0 -map 0:a:0 \
+#     -c:v libx264 -tune zerolatency -preset ultrafast -c:a aac -ar 48000 \
+#     -r 30 \
+#     -sc_threshold 0 \
+#     -force_key_frames "expr:gte(t,n_forced*1)" \
+#     -filter:v:0 scale=w=640:h=360:force_original_aspect_ratio=decrease -b:v:0 800k -maxrate 856k -b:a:0 96k \
+#     -filter:v:1 scale=w=842:h=480:force_original_aspect_ratio=decrease -b:v:1 1400k -maxrate 1498k -b:a:1 128k \
+#     -filter:v:2 scale=w=1280:h=720:force_original_aspect_ratio=decrease -b:v:2 2800k -maxrate 2996k -b:a:2 128k \
+#     -var_stream_map "v:0,a:0,name:steam-360p v:1,a:1,name:steam-480p v:2,a:2,name:stream-720p" \
+#     -hls_playlist 1 -streaming 1 -hls_time 2 -hls_list_size 2 -f hls \
+#     -master_pl_name "master.m3u8" \
+#     -method PUT -http_persistent 1 "http://gcsproxy:8081/upload/$1/%v.m3u8"
+
+/usr/bin/transcoder $1 gcsproxy:8081 2 2
